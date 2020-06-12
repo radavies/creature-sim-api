@@ -21,4 +21,17 @@ You can use [dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local/) do
 
 To run the DB in shared mode (where the same data will be available to the app and workbench) use:
 
-`docker run -p 8000:8000 -v $(pwd)/local/dynamodb:/data/ amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /data`
+`docker run -d -p 8000:8000 -v $(pwd)/local/dynamodb:/data/ amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /data`
+
+If you create a table (for example via workbench) you can check it has been added to the local DB by running:
+
+`aws dynamodb list-tables --endpoint-url http://localhost:8000`
+
+Delete tables using:
+
+`aws dynamodb delete-table --table-name TABLENAME --endpoint-url http://localhost:8000`
+
+Some useful links for using the Dynamo client in AWS SDK V2:
+* [Creating clients](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/creating-clients.html)
+* [Working with tables](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/examples-dynamodb-tables.html)
+* [github examples](https://github.com/awsdocs/aws-doc-sdk-examples)

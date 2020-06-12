@@ -1,6 +1,7 @@
 package creaturesim;
 
 import creaturesim.api.CreatureEndpoint;
+import creaturesim.datastore.DynamoOperations;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -19,7 +20,7 @@ public class CreatureSimApplication extends Application<CreatureSimConfiguration
 
     @Override
     public String getName() {
-        return "Raymond's Hello World";
+        return "Creature Sim";
     }
 
     @Override
@@ -30,7 +31,7 @@ public class CreatureSimApplication extends Application<CreatureSimConfiguration
     @Override
     public void run(CreatureSimConfiguration configuration, Environment environment) throws Exception {
 
-        //Set Up for CORS
+        //Setup for CORS
         final FilterRegistration.Dynamic cors = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
         cors.setInitParameter("allowedOrigins", "*");
         cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
@@ -38,12 +39,19 @@ public class CreatureSimApplication extends Application<CreatureSimConfiguration
         cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
         cors.setInitParameter(CrossOriginFilter.CHAIN_PREFLIGHT_PARAM, Boolean.FALSE.toString());
 
+        //Setup endpoints
         final HelloWorld resource = new HelloWorld(
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
-        final CreatureEndpoint creatureEndpoint = new CreatureEndpoint();
+
+        DynamoOperations dynamoOperations = new DynamoOperations(configuration.getDynamoHost(), configuration.getDynamoRegion());
+        final CreatureEndpoint creatureEndpoint = new CreatureEndpoint(dynamoOperations);
+
+        //Setup Healthcheck
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
+
+        //Register
         environment.jersey().register(resource);
         environment.jersey().register(creatureEndpoint);
         environment.healthChecks().register("template", healthCheck);

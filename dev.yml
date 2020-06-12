@@ -1,2 +1,4 @@
 template: Hello, %s!
 defaultName: Stranger
+dynamoHost: http://localhost:8000
+dynamoRegion: us-west-2
