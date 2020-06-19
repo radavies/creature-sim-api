@@ -1,11 +1,12 @@
 package creaturesim;
 
 import creaturesim.api.CreatureEndpoint;
+import creaturesim.api.WorldEndpoint;
 import creaturesim.datastore.DynamoOperations;
+import creaturesim.models.TerrainMap;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import creaturesim.api.HelloWorld;
 import creaturesim.healthchecks.TemplateHealthCheck;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import javax.servlet.DispatcherType;
@@ -40,19 +41,17 @@ public class CreatureSimApplication extends Application<CreatureSimConfiguration
         cors.setInitParameter(CrossOriginFilter.CHAIN_PREFLIGHT_PARAM, Boolean.FALSE.toString());
 
         //Setup endpoints
-        final HelloWorld resource = new HelloWorld(
-                configuration.getTemplate(),
-                configuration.getDefaultName()
-        );
-
         DynamoOperations dynamoOperations = new DynamoOperations(configuration.getDynamoHost(), configuration.getDynamoRegion());
         final CreatureEndpoint creatureEndpoint = new CreatureEndpoint(dynamoOperations);
+
+        TerrainMap terrainMap = new TerrainMap();
+        final WorldEndpoint worldEndpoint = new WorldEndpoint(terrainMap);
 
         //Setup Healthcheck
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
 
         //Register
-        environment.jersey().register(resource);
+        environment.jersey().register(worldEndpoint);
         environment.jersey().register(creatureEndpoint);
         environment.healthChecks().register("template", healthCheck);
     }
