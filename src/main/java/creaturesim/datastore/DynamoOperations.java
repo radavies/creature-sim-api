@@ -68,8 +68,8 @@ public class DynamoOperations {
         }
     }
 
-    public String CreateNewCreature(String creatureName, String creatorName, int strength, int attack, int defence,
-                            int speed, String parentOneGUID, String parentTwoGUID){
+    public String createNewCreature(String creatureName, String creatorName, int strength, int attack, int defence,
+                                    int speed, String avatarHash, String parentOneGUID, String parentTwoGUID){
 
         String creatureGUID = UUID.randomUUID().toString();
 
@@ -81,6 +81,7 @@ public class DynamoOperations {
         itemValues.put("Attack", AttributeValue.builder().n(String.valueOf(attack)).build());
         itemValues.put("Defence", AttributeValue.builder().n(String.valueOf(defence)).build());
         itemValues.put("Speed", AttributeValue.builder().n(String.valueOf(speed)).build());
+        itemValues.put("AvatarHash", AttributeValue.builder().s(avatarHash).build());
         itemValues.put("Created", AttributeValue.builder().n(String.valueOf(Instant.now().getMillis())).build());
 
         if(parentOneGUID != null && parentTwoGUID != null) {
@@ -105,9 +106,22 @@ public class DynamoOperations {
             client.putItem(request);
             return creatureGUID;
         }
-        catch (DynamoDbException e)
-        {
+        catch (DynamoDbException e) {
             System.err.println(String.format("Could not create item: %s", e.getMessage()));
+            return null;
+        }
+    }
+
+    public ScanResponse getAllCreatures(){
+        try{
+            ScanRequest req = ScanRequest.builder()
+                    .tableName(creatureTableName)
+                    .build();
+            ScanResponse resp = client.scan(req);
+            return resp;
+        }
+        catch (DynamoDbException e){
+            System.err.println(String.format("Could not get items: %s", e.getMessage()));
             return null;
         }
     }
