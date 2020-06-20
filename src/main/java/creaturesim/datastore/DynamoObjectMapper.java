@@ -4,11 +4,8 @@ import creaturesim.models.Creature;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.security.MessageDigest;
 
 public class DynamoObjectMapper {
     public DynamoObjectMapper(){

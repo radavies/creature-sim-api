@@ -12,6 +12,8 @@ Java Dropwizard API for Creature Sim Project.
 * Program arguments are: server dev.yml (where the yml file is for the environment you are running)
 * Class path should be: `creaturesimapi.main`
 * JRE 11
+* To use a Dynamo table in AWS (not local) you need to see the env variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
+    * You can use the command line to `export` or set them in IntelliJ's configs
 
 You should be able to use the above setting to run/debug in your IDE or via the command line.
 
@@ -32,6 +34,6 @@ Delete tables using:
 `aws dynamodb delete-table --table-name TABLENAME --endpoint-url http://localhost:8000`
 
 Some useful links for using the Dynamo client in AWS SDK V2:
-* [Creating clients](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/creating-clients.html)
+* [Creating clients](_https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/creating-clients.html_)
 * [Working with tables](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/examples-dynamodb-tables.html)
 * [github examples](https://github.com/awsdocs/aws-doc-sdk-examples)

@@ -1,6 +1,7 @@
 package creaturesim.datastore;
 
 import org.joda.time.Instant;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -18,7 +19,16 @@ public class DynamoOperations {
 
     public DynamoOperations(String dynamoHost, String dynamoRegion){
         URI hostURI = URI.create(dynamoHost);
-        client = DynamoDbClient.builder().region(selectRegion(dynamoRegion)).endpointOverride(hostURI).build();
+
+        if(dynamoHost.contains("localhost")) {
+            client = DynamoDbClient.builder().region(selectRegion(dynamoRegion)).endpointOverride(hostURI).build();
+        } else {
+            client = DynamoDbClient.builder()
+                    .region(selectRegion(dynamoRegion))
+                    .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                    .build();
+        }
+
         initDB();
     }
 
@@ -57,8 +67,7 @@ public class DynamoOperations {
         try{
             CreateTableResponse response = client.createTable(request);
             String returnedName = response.tableDescription().tableName();
-            if(returnedName == null || returnedName.isEmpty())
-            {
+            if(returnedName == null || returnedName.isEmpty()) {
                 throw new Exception("Could not create table, response returned empty name.");
             }
         }
@@ -96,7 +105,6 @@ public class DynamoOperations {
                 ).build()
         ).build());
 
-
         PutItemRequest request = PutItemRequest.builder()
                 .tableName(creatureTableName)
                 .item(itemValues)
@@ -117,8 +125,7 @@ public class DynamoOperations {
             ScanRequest req = ScanRequest.builder()
                     .tableName(creatureTableName)
                     .build();
-            ScanResponse resp = client.scan(req);
-            return resp;
+            return client.scan(req);
         }
         catch (DynamoDbException e){
             System.err.println(String.format("Could not get items: %s", e.getMessage()));
